@@ -219,6 +219,31 @@ arithmeticMean(1, 2, 3, 4, 5)
 
 
 
+
+// 输入、输出参数
+/*
+ 函数参数默认是常量。试图在函数体中更改参数值将会导致编译错误(compile-time error)。这意味着你不能错 误地更改参数值。如果你想要一个函数可以修改参数的值，并且想要在这些修改在函数调用结束后仍然存在，那 么就应该把这个参数定义为输入输出参数(In-Out Parameters)。
+ 定义一个输入输出参数时，在参数定义前加 inout 关键字。一个输入输出参数有传入函数的值，这个值被函数 修改，然后被传出函数，替换原来的值。
+ 注意 输入输出参数不能有默认值，而且可变参数不能用  inout 标记。
+ 你只能传递变量给输入输出参数。你不能传入常量或者字面量，因为这些量是不能被修改的。当传入的参数作为 输入输出参数时，需要在参数名前加 & 符，表示这个值可以被函数修改。
+ */
+// eg:下例中，   函数有两个分别叫做 和 的输入输出参数:
+
+func swapTwoInts(_ a: inout Int, _ b: inout Int) {
+    let temporaryA = a
+    a = b
+    b = temporaryA
+}
+
+var someInt = 3
+var anotherInt = 107
+swapTwoInts(&someInt, &anotherInt)
+print("someInt is now \(someInt), and anotherInt is now \(anotherInt)")
+// 打印 "someInt is now 107, and anotherInt is now 3"
+//从上面这个例子中，我们可以看到 someInt 和 anotherInt 的原始值在swapTwoInts(_:_:）中被修改改，尽管它们的定义在函数体外。
+
+
+
 // 常量、变量、I/O 参数
 /*
  一般默认在函数中定义的参数都是常量参数，也就是这个参数你只可以查询使用，不能改变它的值。
@@ -269,6 +294,8 @@ print("x = \(x) ;y = \(y)")
 
 // 函数类型及使用
 // 函数的类型，由函数的参数类型和返回类型组成
+
+// eg1：
 func inputs(num1:Int,num2:Int)-> Int{
 
     return num1/num2
@@ -282,6 +309,16 @@ func inputs(name:String)->String{
 }
 var name = inputs(name: "小花")
 print(name)
+// 这两个函数的类型是 (Int, Int) -> Int ，可以解读为“这个函数类型有两个 Int 型的参数并返回一个 Int 型的值。”。
+
+// eg2:
+//下面是另一个例子，一个没有参数，也没有返回值的函数:
+func printHelloWorld() {
+    print("hello, world")
+}
+//这个函数的类型是: () -> Void ，或者叫“没有参数，并返回 Void 类型的函数”。
+
+
 
 
 // 使用函数类型
@@ -306,9 +343,77 @@ func another(addtion:(Int,Int)->Int,a:Int,b:Int){
 }
 another(addtion: sum, a: 100, b: 10)
 
-// 函数嵌套
-// 函数嵌套是指：在函数内部定义一个新的函数，外部的函数可以调用函数内部的函数。
 
+//有相同匹配类型的不同函数可以被赋值给同一个变量，就像非函数类型的变量一样:
+func addTwoInts(_ a: Int, _ b: Int) -> Int {
+    return a + b
+}
+func multiplyTwoInts(_ a: Int, _ b: Int) -> Int {
+    return a * b }
+var mathFunction: (Int, Int) -> Int = addTwoInts
+mathFunction = multiplyTwoInts
+print("Result: \(mathFunction(2, 3))")
+// Prints "Result: 6"
+
+//就像其他类型一样，当赋值一个函数给常量或变量时，你可以让 Swift 来推断其函数类型:
+let anotherMathFunction = addTwoInts
+// anotherMathFunction 被推断为 (Int, Int) -> Int 类型
+
+
+
+
+// MARK: 函数类型作为参数类型
+//你可以用 (Int, Int) -> Int 这样的函数类型作为另一个函数的参数类型。这样你可以将函数的一部分实现留给 函数的调用者来提供。
+// eg：
+func printMathResult(_ mathFunction: (Int, Int) -> Int, _ a: Int, _ b: Int) {
+    print("Result: \(mathFunction(a, b))")
+}
+printMathResult(addTwoInts, 3, 5) // 打印 "Result: 8"
+
+
+
+
+
+// MARK: 函数类型作为返回类型
+//你可以用函数类型作为另一个函数的返回类型。你需要做的是在返回箭头(->)后写一个完整的函数类型。
+
+func stepForward(_ input: Int) -> Int {
+    return input + 1
+}
+func stepBackward(_ input: Int) -> Int {
+    return input - 1
+}
+
+func chooseStepFunction(backward: Bool) -> (Int) -> Int {
+    return backward ? stepBackward : stepForward
+}
+var currentValue = 3
+let moveNearerToZero = chooseStepFunction(backward: currentValue > 0)
+// moveNearerToZero 现在指向 stepBackward() 函数。
+print(moveNearerToZero(12))
+//现在， moveNearerToZero 指向了正确的函数，它可以被用来数到零:
+print("Counting to zero:")
+// Counting to zero:
+while currentValue != 0 {
+    print("\(currentValue)... ")
+    currentValue = moveNearerToZero(currentValue)
+}
+print("zero!")
+// 3...
+// 2...
+// 1...
+// zero!
+
+
+// MARK: 函数嵌套
+// 定义在全局域中的函数叫全局函数。你也可以把 函数定义在别的函数体中，称作 嵌套函数(nested functions)。
+// 函数嵌套是指：在函数内部定义一个新的函数，外部的函数可以调用函数内部的函数。
+/*
+ 默认情况下，嵌套函数是对外界不可见的，但是可以被它们的外围函数(enclosing function)调用。一个外围 函数也可以返回它的某一个嵌套函数，使得这个函数可以在其他域中被使用。
+ 
+ */
+
+// eg1:
 func funcA(para number:Int)->()->Int{
 
     var currentNum = 0
@@ -320,10 +425,26 @@ func funcA(para number:Int)->()->Int{
     return funB
 }
 
+// eg2:
+// 使用返回嵌套的方式写编函数如下：
 let result = funcA(para: 100)
 print(result())
-
-
-
+ func chooseStepAction(backward: Bool) -> (Int) -> Int {
+    func stepForward(input: Int) -> Int { return input + 1 }
+    func stepBackward(input: Int) -> Int { return input - 1 }
+    return backward ? stepBackward : stepForward
+}
+var currentNumber = -4
+let moveNumberToZero = chooseStepAction(backward: currentNumber > 0)
+while currentNumber != 0 {
+    print("\(currentNumber)... ")
+    currentNumber = moveNumberToZero(currentNumber)
+}
+print("zero!")
+// -4...
+// -3...
+// -2...
+// -1...
+// zero!
 
 
