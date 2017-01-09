@@ -143,6 +143,42 @@ func outParameterAction(firstNum a:Int, secondNum b:Int){
 
 outParameterAction(firstNum: 90, secondNum: 100);
 
+
+// 指定参数标签
+// 你可以在函数名称前指定它的参数标签，中间以空格分隔:
+
+func someFunction(argumentLabel parameterName: Int) {
+    // 在函数体内，parameterName 代表参数值
+}
+//这个版本的 greet(person:) 函数，接收一个人的名字和他的家乡，并且返回一句问候:
+func greet(person: String, from hometown: String) -> String {
+    return "Hello \(person)!  Glad you could visit from \(hometown)."
+}
+print(greet(person: "Bill", from: "Cupertino"))
+// 打印 "Hello Bill! Glad you could visit from Cupertino."
+//参数标签的使用能够让一个函数在调用时更有表达力，更类似自然语言，并且仍保持了函数内部的可读性以及清晰的意图。
+
+
+// 忽略 参数标签
+//如果你不希望为某个参数添加一个标签，可以使用一个下划线( _ )来代替一个明确的参数标签。
+func someFunction(_ firstParameterName: Int, secondParameterName: Int) {
+    // 在函数体内，firstParameterName 和 secondParameterName 代表参数中的第一个和第二个参数值
+}
+someFunction(1, secondParameterName: 2)
+//如果一个参数有一个标签，那么在调用的时候必须使用标签来标记这个参数。
+
+
+
+// 默认参数值
+// 你可以在函数体中通过给参数赋值来为任意一个参数定义默认值(Deafult Value)。当默认值被定义后，调用这 个函数时可以忽略这个参数。
+
+func someFunction(parameterWithoutDefault: Int, parameterWithDefault: Int = 12) {
+    // 如果你在调用时候不传第二个参数，parameterWithDefault 会值为 12 传入到函数体中。
+}
+someFunction(parameterWithoutDefault: 3, parameterWithDefault: 6) // parameterWithDefault = 6
+someFunction(parameterWithoutDefault: 4) // parameterWithDefault = 12
+
+
 // 可变参数
 /*
  可变参数可以接受零个或多个值。函数调用时，你可以用可变参数来指定函数参数，其数量是不确定的。
@@ -161,6 +197,26 @@ func vari<Y>(members:Y...){
 vari(members: 1,2,3,4,5,6)
 vari(members: 1.23,2.23,3.23,4.23,5.23)
 vari(members: "guge","baodu","damuzhi")
+
+// eg:
+/*
+ 可变参数的传入值在函数体中变为此类型的一个数组。例如，一个叫做 numbers 的 Double... 型可变参 数，在函数体内可以当做一个叫 numbers 的 [Double] 型的数组常量。
+下面的这个函数用来计算一组任意长度数字的 算术平均数(arithmetic mean):
+ 
+ 注意：一个函数最多只能拥有一个可变参数。
+ */
+
+func arithmeticMean(_ numbers: Double...) -> Double {
+    var total: Double = 0
+    for number in numbers {
+        total += number
+    }
+    return total / Double(numbers.count)
+}
+arithmeticMean(1, 2, 3, 4, 5)
+// 返回 3.0, 是这 5 个数的平均数。 arithmeticMean(3, 8.25, 18.75)
+// 返回 10.0, 是这 3 个数的平均数。
+
 
 
 // 常量、变量、I/O 参数
